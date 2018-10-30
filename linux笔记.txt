@@ -1,0 +1,232 @@
+安装软件的多种方法：
+1、rpm -ivh 包名.rpm 
+	有依赖问题: 安装A，A需要先安装B，安装B需要先安装C。。。
+	缺点：不能定制。
+
+2、yum安装 解决rpm安装的依赖问题，安装更简单化。
+	优点：简单易用高效
+	缺点：不能定制。
+	
+3、编译（C语言源码-编译二进制等）
+./configure(配置),make(编译),make install(安装)
+	优点：可以定制
+	缺点：复杂、速度慢、效率低。
+	
+4、定制化制作rpm包，搭建yum仓库，把我定制的rpm包放到yum仓库，进行yum安装
+	优点：2跟3的优点
+	缺点：复杂。
+	
+
+安装Nginx
+1、安装Nginx所需的pcre库
+	pcre全称（Perl Compatible Regular Expressions），中文“Perl兼容正则表达式”，官方站点为
+	http://www.pcre.org/,安装pcre库是为了使Nginx支持具备URI重写功能的Rewrite模块，如果不安装
+	pcre库，则Nginx无法使用Rewrite模块功能，Nginx的Rewrite模块功能几乎是企业应用必须。
+	
+	make安装pcre库过程如下：
+	1）tar xf nginx-1.6.3.tar.gz
+	2) cd nginx-1.6.3
+
+
+
+常用150个命令
+1、mkdir  	make directories 	创建目录   		例子：mkdir /data  在根目录下创建data目录
+			创建多级目录	mkdir -p /data/a/b/c
+2、ls     	list 				列表目录文件	例子：ls /   列表根目录下文件和目录
+		-l(long)长格式，-d（directories）查看目录
+3、cd	change directory 	改变目录地址
+		相对路径   不从根目录开始的路径   如data/temp/good
+		绝对路径   从根目录开始  如/data/temp/good
+4、pwd		print work directory	打印工作目录（显示当前所在的路径）
+5、touch	touch [文件名]  如果文件存在，改变文件的访问时间等时间戳。  如不存在，创建文件
+6、	vi		记事本
+	vim		复杂编辑器  功能复杂 高亮，自动缩进（写脚本用）
+7、echo	echo 'i am superman'>oldboy.txt		如果文件存在，则清空文件内容，将字符串写入，如不存在则创建并写入
+
+8、echo	打印输出内容，配合> 或 >>可以为文件覆盖及追加内容。
+	> 意思为重定向，会清除文件里所有以前的数据，
+	>>为内容追加，只在文件尾部追加需要的内容
+
+9、cat 查看文件内容
+	cat >oldboy.txt 
+	i am studying linux..
+
+	cat >>oldboy.txt<<EOF
+	i am studying javascript
+	EOF
+
+10、xargs 
+
+11、cp  （copy）	拷贝文件或目录，默认不能拷贝目录   -r递归拷贝，将目录里所有的目录及文件； 
+	-a：相当于-pdr,   -p：连同档案的属性一起复制过去，而非使用默认属性；-d：若源文件为链接文件（link file），则复制链接文件属性，而非该文件本身
+	cp [-aifpru] [源文件] [目标文件]
+
+12、mv	（move)		剪切文件或目录
+	mv [ifu] [源文件/源目录] [目标文件/目标目录]
+
+13、rm	（remove）	删除!!慎用！！非常危险
+	rm [-fr] [文件或目录] 	-f（force）：强制删除，不提示；-r（recursive）：递归删除整个目录；
+
+14、man	[命令] 	查看命令的说明
+
+15、(*****五星命令)
+	find 查找 -type 文件类型（f(file)，d(directory),c(char),b(block),s(socket),l(link)）
+			  -name "文件名"
+			  -mtime 时间，按修改时间查找，时间数字 +7 7天以前，7 第七天， -7 最近7天
+	find /data -type f（查找/data目录下，类型为文件的东西）
+	find /data -type f -name "oldboy.txt" （查找/data目录下，类型为文件，名字为oldboy.txt的东西）
+	find /data -type f -name "oldboy.txt" -exec rm {} \;
+			（将查找到的文件执行删除操作，其中{}代表找到的内容）
+	find /data -type f -name "*.txt" （查找/data目录下，类型为文件，名字以.txt结尾的东西）
+	find /data -type f -name "*.txt" |xargs  (相当于把所有找到的东西整合成一行)
+	find /data -type f -name "*.txt" |xargs rm -f (相当于把所有找到的东西整合成一行，传到rm -f后面删除)
+	find . -type f -name "*.log" -mtime +15 |xargs rm -f  (查找当前目录.log结尾、15天以前修改过文件，并删除)
+	find /data -type d -name "*.log" -mtime +10 |xargs rm -fr (查找当前目录.log结尾、10天以前修改过目录，并删除)
+
+16、特殊字符：
+	>或1> 		输出重定向：把前面输出的东西输入到后边的文件中，会清除文件原有内容。
+	>>或1>> 	追加输出重定向：把前面输出的东西追加到后边的文件中，不会清除文件原有内容。
+	<或0< 		输入重定向：用于改变命令的输入，后面指定输入内容，前面跟文件名。
+	<<或0<< 	追加输入重定向：。
+	|  	管道  
+	.. 	上级目录  
+	. 	当前目录  
+	``（反撇）  引用命令，优先执行
+	{} 序列相当于seq，一般配合echo等命令使用，find里的{}的意思是前面命令的结果
+	！	!+字母 	表示 调出最近一次以此字母开头的命令
+		!!  	表示使用最近一次操作的命令
+		!+数字	表示调出历史的第几条命令
+		取反的意思，跟C语言一样 
+	~	代表当前用户的家目录
+	cd - 退回到上一次目录
+
+17、(*****五星命令) linux三剑客之三  
+	grep	过滤需要的内容；-v 排除内容，例子： grep -v oldboy text.txt
+
+18、head 	头，头部	输出文件的前n行，默认前10行   head -10 text.txt
+
+19、tail	尾部	    输出文件的后n行，默认后10行   tail -10 text.txt
+
+20、mkdir	mkdir -p /data/text/a/b  递归创建目录
+
+20、alias 	别名  默认cp mv rm ls 等使用别名  cp = 'cp -i'  rm = 'rm -i'等
+	加反斜线 \cp 或 全路径/bin/cp 则不使用别名
+	例子 定义别名：alias net='cat /etc/sysconfig/network-scripts/ifcfg-eth0'
+	自定义别名 在内存里，系统重启则丢失
+	若想永久生效，需在    /etc/profile （全局生效）		~/.bashrc （当前用户生效）
+21、unalias  取消别名
+
+22、seq sequence 序列  seq 1 [3] 10   ：从1开始，间隔3，到10的序列
+	seq -s ' ' 10 =>1 2 3 4 5 6 7 8 9 10
+		-s指定分隔符  默认是回车
+
+23、sed （stream editor） linux三剑客老二
+	流编辑器，实现对文件的 增删改查替换。
+	参数 -n 取消默认输出
+	sed -n '20,30'p ett.txt  打印p文件中20到30行的信息
+	sed -n '20'p ett.txt  	 打印p文件中第20行的信息
+	sed 's#oldgirl#gongli#g' oldboy.txt   将oldboy.txt输出中的oldgirl替换为gongli（文件并没改，输出改了）
+		s替换，g与s联合使用时表示对当前行全局匹配替换；#是分隔符，也可以用/@等替换
+	sed -i 's#oldgirl#gongli#g' oldboy.txt   将oldboy.txt中的oldgirl替换为gongli并输出（文件也改了）
+		-i	修改文件内容；-e 
+
+	Q：将/oldboy 目录下所有以.sh结尾的文件中的'oldboy'替换为'oldmother'
+		find -type f -name "*.sh"|xargs sed -i 's#oldboy#oldmother#g'
+		sed -i 's#oldboy#oldmother#g' `find -type f -name "*.sh"`
+ 
+24、awk   linux三剑客老大
+	过滤、输出内容，一门语言。NR 行号
+	awk '19<NR && NR<31' ett.txt   ==>输出文件中第20到第30行的内容
+
+25、man 
+
+26、***建立软连接  必须用全路径，不然会出错
+
+27、scp		secure copy 	命令格式：scp [参数] [原路径] [目标路径]		用于在Linux下进行远程拷贝文件的命令，和它类似的命令有cp，不过cp只是在本机进行拷贝不能跨服务器，而且scp传输是加密的。可能稍微影响以下速度。当你服务器硬盘变为只读read only system时，用scp可以把文件移出来。
+
+28、echo {1..10} 		输出 1 2 3 4 5 6 7 8 9 10
+	mkdir /data/dir{1..5}
+
+29、终止进程：
+		1. ps -ef|grep nginx #查找nginx进程，找到进程号
+		2. kill -s 9 process_id
+		
+30、网络故障排查：
+	1、检测网络通不通：		ping 192.168.12.33
+		不通的原因可能是：网卡、网线、ip、防火墙等
+	2、检测服务是否是好的	telnet 192.168.12.33 22		（检测22端口上的服务是否是通的）
+		telnet 也可以远程连接，因为不是加密的所以都没怎么用了
+		不通可能是因为：a 服务器防火墙阻挡：关闭防火墙 /etc/init.d/iptables stop
+						b 端口没开放，服务器端没有监听你连接的端口
+							netstat -lntup|grep 22 （以ssh服务22端口为例）
+							netstat -lntup|grep sshd 
+		ssh服务，进程名sshd， openssh, openssl
+
+31、uname	打印系统信息	-m 32or64   -r kernel version    -a  all info
+		
+		查看Linux版本
+			cat /etc/redhat-release
+			uname -r	（查看内核版本）
+			uname -m	（查看位数）
+
+32、添加用户
+		useradd zacky	（添加用户）
+		tail -l /etc/passwd
+		passwd zacky	（为zacky设置密码）
+		echo "123456"|passwd --stdin zacky		（非交互式更改密码）
+		
+33、运行级别
+		0	halt	关机
+		1	single user mode
+		2	multiuser without NFS
+		3	multiuser 多用户命令行
+		4	unused
+		5	X11	桌面模式
+		6	reboot	重启
+		切换运行级别  init
+		init 0  #关机
+		init 6  #重启
+		init 5  #切换到桌面模式
+		
+34、shutdown(halt、init 0) 关机
+	关机 shutdown -h now
+		
+35、reboot(init 6、shutdown -r now)重启
+
+36、关闭防火墙 /etc/init.d/iptables stop   临时关闭，下次开机则失效
+	查看防火墙 /etc/init.d/iptables status
+	永久关闭防火墙 chkconfig iptables off  下次开机也会关闭
+	
+37、设置连接超时时间 export TMOUT=1200   1200秒不操作，锁屏  临时生效
+	echo 'export TMOUT=1200' >>/etc/profile  永久生效
+
+38、history		命令操作历史记录
+	!617 	执行第617条历史记录
+	history -c 	清空历史记录
+	history -d 5  清空第5条历史记录
+	export HISTSIZE=5	控制命令行操作历史记录的数量
+	export HISTFILESIZE=5	控制命令行命令文件的数量
+	echo 'export HISTSIZE=5' >>/etc/profile		永久生效
+	
+	实际工作中类似的变量还有不少，更多的linux系统的环境变量，可以执行man bash查询。
+	
+39，挂载windows硬盘：1，先安装ntfs-3g  2，用fdisk -l查看硬盘信息  3，然后挂载ntfs硬盘
+	mount -t ntfs-3g /dev/sda1 /mnt/winc
+	mount -t ntfs-3g /dev/sda5 /mnt/wind
+	mount -t ntfs-3g /dev/sda6 /mnt/wine
+	
+	如果想让系统开机自动挂载移动硬盘，编辑/etc/fstab文件，在文件最后添加以上三行内容。注意修改之前先备份文件。
+
+
+
+
+
+
+
+
+
+
+
+
+
+		

@@ -1,0 +1,69 @@
+	LoadFile "c:/users/administrator/appdata/local/programs/python/python36/python36.dll"
+	LoadModule wsgi_module "c:/users/administrator/appdata/local/programs/python/python36/lib/site-packages/mod_wsgi/server/mod_wsgi.cp36-win_amd64.pyd"
+	WSGIPythonHome "c:/users/administrator/appdata/local/programs/python/python36"
+
+
+安装 apache   和  python  的过程网上教程很多 ，不再赘述！
+特别强调注意的是： apache 的位制 和 python 的位制必须一致  （即 apache 32位的就只能安装 python 32位的【64位的做相应安装】）网上很多教程没强调这一点。导致后续的很多工作白费，还找不到问题所在！
+ mod_wsgi 安装要跟python和apache相匹配。我的是python3.6（64位）和apache2.4：httpd-2.4.35-win64-VC14（64位，VC14编译），那么我选择的mod_wsgi是mod_wsgi-4.5.24+ap24vc14-cp36-cp36m-win_amd64.whl（ap24vc14这对应阿帕奇2.4vc14，cp36对应cpython3.6,amd64对应64位）
+1、将 apache 和 Python 自行安装完成（我用的是 apache2.4  64位，python3.6 64位       操作系统 win7  64位）
+2、整合 mod_wsgi 模块
+网上很多教程说的是用   mod_wsgi.so  文件，但从python 3.5 后就没有 mod_wsgi.so 文件，所以在此采用其他方法！
+
+2.1、下载 mod_wsgi Python的插件 http://www.lfd.uci.edu/~gohlke/pythonlibs/#mod_wsgi   到这个网址下载与所安装 apache 版本位制和python 版本位制匹配的扩展模块文件  ；我用的是 ：
+?	mod_wsgi-4.5.24+ap24vc14-cp36-cp36m-win_amd64.whl
+?	apache2.4 64bit 版本 python3.6 64bit 版本  amd64不是指系统，而是指 apache 和python 的位制是64位
+
+找到与自己安装环境匹配的 扩展模块文件 下载 
+2.2、.把下载的 .whl文件复制到 python\Scripts下使用 pip 进行安装
+1.	pip install mod_wsgi-4.5.24+ap24vc14-cp36-cp36m-win_amd64.whl
+进行安装在安装成功后在python的安装目录的\scripts文件夹下运行 
+1.	mod_wsgi-express module-config  
+运行后命令行得到如下结果
+
+LoadFile "c:/users/administrator/appdata/local/programs/python/python36/python36.dll"
+LoadModule wsgi_module "c:/users/administrator/appdata/local/programs/python/python36/lib/site-packages/mod_wsgi/server/mod_wsgi.cp36-win_amd64.pyd"
+WSGIPythonHome "c:/users/administrator/appdata/local/programs/python/python36"
+
+
+把这三行内容复制到apache   http.conf  文件下进行配置放到 LoadModule 最后的部分 
+
+
+3、配置Apache和django项目
+在apache   http.conf  最后添加   目录不同，请对照自己的项目做相应更改
+#wsgi文件的位置(这是你django项目中wsgi.py的位置)
+WSGIScriptAlias / D:/Python/Project/Peppa/Peppa/wsgi.py
+#项目位置
+WSGIPythonPath D:/Python/Project/Peppa
+
+#设置脚本
+<Directory D:/Python/Project/Peppa/Peppa>
+<Files wsgi.py>
+Require all granted
+setHandler wsgi-script
+</Files>
+</Directory>
+
+Alias /static "D:/Python/Project/Peppa/static"
+<Directory "D:/Python/Project/Peppa/static">
+Require all granted
+</Directory>
+
+4、在项目的  wsgi.py    文件中 import os   后添加  如下代码
+Import sys
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BASE_DIR)
+
+
+
+
+
+5、项目设置添加设置settings.py
+STATIC_ROOT = os.path.join(BASE_DIR, '/static/')
+在urls.py添加  不添加显示不了static
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+6、配置完成 ，重启 apache 
+
+--------------------- 本文来自 964620019 的CSDN 博客 ，全文地址请点击https://blog.csdn.net/u012846792/article/details/77712958
+
