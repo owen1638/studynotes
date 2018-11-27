@@ -217,14 +217,55 @@
 	
 	如果想让系统开机自动挂载移动硬盘，编辑/etc/fstab文件，在文件最后添加以上三行内容。注意修改之前先备份文件。
 
+40，关闭SELinux 
+	sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config    设置配置文件。需重启生效
+	getenforce  查看当前enforce
+	setenforce 0  将当前设置为permissive
+	
+41、挂载点  设备的入口。如果没有挂载点，所有设备都不能访问。挂载点就是设备的入口
+	mount /设备。。。 /mnt/设备挂载点
+	
 
+	
+重要目录
+/dev/ 设备目录
+/etc/ 系统配置及服务配置文件、启动命令的目录
+/proc 显示内核及进程信息的虚拟文件系统
+/tmp  临时文件目录，公共厕所，客厅
+/home 普通用户家目录
+/root 超级用户家目录
+/var  变化的目录，一般是日志文件，cache的目录
+/usr  用户程序及数据、帮助文件、二进制命令等的目录
+/bin  普通用户命令的目录
+/sinb 和 /usr/sbin  超级用户命令的目录
 
+重要子目录的说明
+1）网卡的配置文件  /etc/sysconfig/network-scripts/ifcfg-eth0  （地一张网卡的配置文件） 
+		DEVICE = eth0|eth1… //设备编号
+		ONBOOT=yes|no //是否随系统启动而启动
+		HWADDR=00:0C:29:62:30:22 // MAC地址
+		TYPE=Ethernet // 类型
+		BOOTPROTO=static|dhcp|none // 地址分配方式
+		IPADDR=192.168.1.156 // IP地址
+		NETMASK=255.255.255.0/PREFIX=24 //子网掩码
+		GATEWAY=192.168.1.1 // 网关地址
+		DNS1=192.168.1.1 // DNS地址，可选多个，用编号区别
+		DEFROUTE=yes|no // 路由设置
+		注：当ONBOOT设置为NO时，系统启动不会启动上面的DEVICE。需要将ONBOOT改为YES或是手动启动服务
 
+	配置完文件后，重启网卡
+		/etc/init.d/network restart   #重启所有网卡
+		ifdown eth0 && ifup eth0      #只针对eth0网卡
 
+2）本地客户端DNS的配置文件  /etc/resolv.conf
 
+3）设定用户ip与名字（或域名）的对应解析表，相当于本地LAN局域网内的DNS
+		/etc/hosts
 
-
-
+4）开机挂载		/etc/fstab
+		
+5）用于存放开机自启动程序命令的文件(chkconfig 常用来管理yum/rpm 安装的程序的服务的开机自启动），自己开发的程序，习惯把启动命令放入/etc/rc.local，实现开机启动这些程序，linux开机时会把/etc/rc.local里的内容执行一遍             （***windows 开机自启动    msconfig）
+	
 
 
 
