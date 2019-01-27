@@ -1,0 +1,49 @@
+基本命令：
+    scrapy startproject xxx
+    cd xxx
+    scrapy genspider spidername domain.com
+    scrapy crawl spidername
+编写代码：
+    a. spidername不能省略
+    b. start_urls, 起始url地址
+    c. allowed_domains = ["chouti.com"] 
+    d. 重写start_requests,指定初始处理请求的函数
+        def start_requests(self):
+            for url in self.start_urls:
+                yield Request(url,callback = self.parse)
+    e. 相应response
+        response.url
+        response.text
+        response.body
+        response.meta = {'depth':'深度'}
+    f. 采集数据
+        Selector(response = response).xpath()
+        //div   子孙中的div
+        //div[@id="cc"] 
+        //div[starts-with(@id,"cc")]    id属性以cc起始的div标签
+        //div[re:test(@id,"i\d+")]        id满足正则表达式的div标签
+        //div/a                         div的儿子中的a标签
+        //div[contains(@id,"cc")]       id属性中包含cc的div标签
+
+        obj.xpath('./')                 obj儿子
+        obj.xpath('.//')                obj子孙
+
+        //div/a/text()                  div儿子中a标签的text
+        //div/a/@href                   div儿子中a标签的href属性
+
+        Selector().extract()
+        Selector().extract_first()
+    g. yield Request(url,callback=self.parse) #将url交给调度器
+        还有另一种写法:     yield response.follow(nexturl,callback = self.parse)
+    h. yield Item(name='xx',title='xxx')         #将Item交给Pipeline
+    i. pipeline
+        class Foo:
+            def process_item(self,item,spider):
+                ...
+
+        设置文件settings
+            # pipeline设置
+            ITEM_PIPELINES = {
+                'xiaohua.pipelines.XiaohuaPipeline': 300,   # 这个值越大,优先级越高,先执行
+                }
+        
