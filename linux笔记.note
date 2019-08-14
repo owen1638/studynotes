@@ -225,6 +225,16 @@
 41、挂载点  设备的入口。如果没有挂载点，所有设备都不能访问。挂载点就是设备的入口
 	mount /设备。。。 /mnt/设备挂载点
 	
+42、开机自动启动脚本  	
+	添加脚本至	/etc/rc.local 文件
+
+		#!/bin/bash
+		# This script will be executed *after* all the other init scripts.
+		# You can put your own initialization stuff in here if you don't
+		# want to do the full Sys V style init stuff.
+		touch /var/lock/subsys/local
+		#需要执行的脚本写绝对路径
+		#在这里添加脚本
 
 	
 重要目录
